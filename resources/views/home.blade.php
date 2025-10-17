@@ -20,7 +20,14 @@
                         @forelse($laporans as $laporan)
                             <div class="bg-gray-100 p-4 rounded-lg shadow">
                                 @if($laporan->foto)
-                                    <img src="{{ asset('storage/' . $laporan->foto) }}" alt="Foto Laporan" class="w-full h-48 object-cover rounded-md mb-4">
+                                    <div class="bg-gray-100 p-4 rounded-lg shadow">
+    @if($laporan->foto)
+        {{-- Ganti baris img Anda dengan yang ini --}}
+        <img src="{{ asset('storage/' . $laporan->foto) }}" alt="Foto Laporan {{ $laporan->judul }}" class="w-full h-48 object-cover rounded-md mb-4">
+    @endif
+    <h3 class="font-bold text-lg">{{ $laporan->judul }}</h3>
+    {{-- ... sisa kode Anda ... --}}
+</div>
                                 @endif
                                 <h3 class="font-bold text-lg">{{ $laporan->judul }}</h3>
                                 <p class="text-sm text-gray-600">Lokasi: {{ $laporan->lokasi }}</p>

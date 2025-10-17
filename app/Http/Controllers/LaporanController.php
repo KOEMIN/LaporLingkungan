@@ -33,7 +33,7 @@ class LaporanController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
+        
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -43,9 +43,11 @@ class LaporanController extends Controller
 
         // Proses upload foto jika ada
         if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('public/fotos_laporan');
-            $validated['foto'] = basename($path);
-        }
+    // Simpan file dan dapatkan path lengkapnya (misal: fotos_laporan/nama.jpg)
+    $path = $request->file('foto')->store('fotos_laporan', 'public');
+    // Simpan path lengkap tersebut ke array validated
+    $validated['foto'] = $path; // <-- PERBAIKAN DI SINI
+}
 
         // Tambahkan user_id dari user yang sedang login
         $validated['user_id'] = Auth::id();
@@ -85,13 +87,10 @@ class LaporanController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
-            if ($laporan->foto) {
-                Storage::delete('public/fotos_laporan/' . $laporan->foto);
-            }
-            $path = $request->file('foto')->store('public/fotos_laporan');
-            $validated['foto'] = basename($path);
-        }
+    // ... (kode hapus foto lama)
+        $path = $request->file('foto')->store('fotos_laporan', 'public');
+        $validated['foto'] = $path; // <-- PERBAIKAN DI SINI
+}
 
         $laporan->update($validated);
 
