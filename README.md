@@ -1,61 +1,69 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+LaporLingkungan 🏡
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+LaporLingkungan adalah aplikasi web berbasis Laravel yang memungkinkan warga untuk melaporkan masalah lingkungan di sekitar mereka. Proyek ini bertujuan untuk meningkatkan kesadaran dan mempercepat penanganan isu-isu lokal seperti tumpukan sampah liar, fasilitas umum yang rusak, atau jalan berlubang.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Proyek ini terinspirasi oleh *Tujuan Pembangunan Berkelanjutan (SDG) \#11: Kota dan Permukiman Berkelanjutan*.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## ✨ Fitur Utama
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+  * ✅ *Autentikasi Pengguna:* Sistem pendaftaran (register) dan masuk (login) yang aman menggunakan Laravel Breeze.
+  * 📝 *Manajemen Laporan (CRUD):* Pengguna dapat membuat, melihat, mengubah, dan menghapus laporan masalah lingkungan.
+  * 🖼️ *Upload Foto:* Setiap laporan dapat disertai dengan bukti foto untuk memberikan detail yang lebih jelas.
+  * 🔐 *Otorisasi:* Pengguna hanya dapat mengubah atau menghapus laporan yang mereka buat sendiri.
+  * 🎨 *Tampilan Responsif:* Dibangun dengan Tailwind CSS agar dapat diakses dengan baik di desktop maupun perangkat mobile.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+ 🛠️ Teknologi yang Digunakan
 
-### Premium Partners
+  * **Backend:** PHP 8.2, Laravel 10
+  * **Frontend:** Blade, Tailwind CSS, Alpine.js
+  * **Database:** MySQL
+  * **Web Server:** Nginx / Apache (via Laragon)
+  * **Development Environment:** Laragon
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+🏗️ Struktur Database
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Proyek ini menggunakan dua tabel utama:
 
-## Security Vulnerabilities
+1.  *`users`*: Menyimpan data pengguna (disediakan oleh Laravel Breeze).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+      * `id`, `name`, `email`, `password`, `timestamps`
 
-## License
+2.  *`laporans`*: Menyimpan semua data laporan yang dibuat.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+      * `id` (PK)
+      * `user_id` (FK ke `users.id`)
+      * `judul`
+      * `deskripsi`
+      * `lokasi`
+      * `foto`
+      * `status` (enum: 'Dilaporkan', 'Diproses', 'Selesai Ditangani')
+      * `timestamps`
+
+Relasi antara keduanya adalah **One-to-Many**: Satu `User` bisa memiliki banyak `Laporan`.
+
+
+
+## 🤝 Panduan Berkontribusi
+
+Kami sangat terbuka untuk kontribusi\! Silakan ikuti alur kerja berikut:
+
+1.  *Fork* repository ini.
+2.  Buat **branch** baru untuk fitur Anda (`git checkout -b fitur/NamaFiturBaru`).
+3.  *Commit** perubahan yang Anda buat (`git commit -m 'feat: Menambahkan NamaFiturBaru'`).
+4.  *Push* ke branch Anda (`git push origin fitur/NamaFiturBaru`).
+5.  Buat *Pull Request* baru.
+
+-----
+
+## 📄 Lisensi
+
+Proyek ini berada di bawah Lisensi MIT. Lihat file `LICENSE` untuk detail lebih lanjut.
