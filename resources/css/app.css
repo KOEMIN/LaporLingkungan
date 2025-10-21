@@ -1,3 +1,37 @@
+/* resources/css/app.css */
+
+/* 1. Impor Font Poppins */
+/* Ini harus ada di bagian paling atas. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* 2. Layer Tailwind CSS */
+/* Pastikan urutan ini benar: base, components, utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 3. Custom Styling & Utilities (Opsional, tapi direkomendasikan) */
+@layer utilities {
+    /* Custom Shadow yang memberi aksen warna Emerald/Teal */
+    .shadow-2xl-emerald {
+        /* Menggunakan warna Emerald untuk shadow yang lebih dramatis dan sejalan dengan tema lingkungan */
+        box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.4); 
+    }
+}
+
+/* 4. Custom Styling Global untuk Scrollbar (Tampilan Rapi) */
+/* Ini memberikan tampilan scrollbar yang lebih rapi (opsional) */
+@layer base {
+    /* Hanya pada WebKit (Chrome, Safari) */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+}

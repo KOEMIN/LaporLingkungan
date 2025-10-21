@@ -2,114 +2,111 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Laporan;
 use Illuminate\Http\Request;
+use App\Models\Laporan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-
-
-
 class LaporanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // 🔹 Menampilkan semua laporan di halaman utama
     public function index()
     {
-        $laporans = Laporan::latest()->paginate(10); // Ambil semua laporan, urutkan dari terbaru
-        return view('home', compact('laporans')); // Kirim data ke view 'home'
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('laporan.create'); // Menampilkan form
+        $laporans = Laporan::latest()->paginate(6);
+        return view('home', compact('laporans'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // 🔹 Menampilkan form membuat laporan baru
+    public function create()
+    {
+        return view('laporan.create');
+    }
+
+    // 🔹 Menyimpan laporan baru ke database
     public function store(Request $request)
     {
-        
-        $validated = $request->validate([
+        $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'lokasi' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Foto opsional, maks 2MB
+            'foto' => 'nullable|image|max:2048',
         ]);
 
-        // Proses upload foto jika ada
-        if ($request->hasFile('foto')) {
-    // Simpan file dan dapatkan path lengkapnya (misal: fotos_laporan/nama.jpg)
-    $path = $request->file('foto')->store('fotos_laporan', 'public');
-    // Simpan path lengkap tersebut ke array validated
-    $validated['foto'] = $path; // <-- PERBAIKAN DI SINI
-}
+        $fotoPath = $request->hasFile('foto')
+            ? $request->file('foto')->store('foto_laporan', 'public')
+            : null;
 
-        // Tambahkan user_id dari user yang sedang login
-        $validated['user_id'] = Auth::id();
+        // ✅ Status default disesuaikan dengan enum di database
+        Laporan::create([
+            'user_id' => Auth::id(),
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'lokasi' => $request->lokasi,
+            'status' => 'Dilaporkan',
+            'foto' => $fotoPath,
+        ]);
 
-        Laporan::create($validated);
-
-        return redirect()->route('home')->with('success', 'Laporan berhasil dibuat!');
+        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dikirim!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Laporan $laporan)
+    // 🔹 Menampilkan detail laporan
+    public function show($id)
     {
+        $laporan = Laporan::findOrFail($id);
         return view('laporan.show', compact('laporan'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Laporan $laporan)
+    // 🔹 Menampilkan form edit laporan
+    public function edit($id)
     {
-        $this->authorize('update', $laporan); // Cek policy
-        return view('laporan.edit', ['laporan' => $laporan]);
+        $laporan = Laporan::findOrFail($id);
+        return view('laporan.edit', compact('laporan'));
     }
 
-    public function update(Request $request, Laporan $laporan)
+    // 🔹 Update laporan
+    public function update(Request $request, $id)
     {
-        $this->authorize('update', $laporan); // Cek policy
+        $laporan = Laporan::findOrFail($id);
 
-        $validated = $request->validate([
+        $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'lokasi' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:Dilaporkan,Diproses,Selesai Ditangani',
+            'status' => 'required|string|in:Dilaporkan,Diproses,Selesai Ditangani',
+            'foto' => 'nullable|image|max:2048',
         ]);
 
+        // Jika ada foto baru, hapus foto lama dan upload baru
         if ($request->hasFile('foto')) {
-    // ... (kode hapus foto lama)
-        $path = $request->file('foto')->store('fotos_laporan', 'public');
-        $validated['foto'] = $path; // <-- PERBAIKAN DI SINI
-}
+            if ($laporan->foto && Storage::disk('public')->exists($laporan->foto)) {
+                Storage::disk('public')->delete($laporan->foto);
+            }
+            $laporan->foto = $request->file('foto')->store('foto_laporan', 'public');
+        }
 
-        $laporan->update($validated);
+        // Update data laporan
+        $laporan->update([
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'lokasi' => $request->lokasi,
+            'status' => $request->status,
+            'foto' => $laporan->foto,
+        ]);
 
-        return redirect()->route('laporan.show', $laporan)->with('success', 'Laporan berhasil diperbarui!');
-    }
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Laporan $laporan)
-{
-    $this->authorize('delete', $laporan); // Cek policy
-
-    // Hapus foto dari storage
-    if ($laporan->foto) {
-        Storage::delete('public/fotos_laporan/' . $laporan->foto);
+        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil diperbarui!');
     }
 
-    $laporan->delete();
+    // 🔹 Hapus laporan
+    public function destroy($id)
+    {
+        $laporan = Laporan::findOrFail($id);
 
-    return redirect()->route('home')->with('success', 'Laporan berhasil dihapus!');
-}
+        if ($laporan->foto && Storage::disk('public')->exists($laporan->foto)) {
+            Storage::disk('public')->delete($laporan->foto);
+        }
+
+        $laporan->delete();
+
+        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dihapus!');
+    }
 }
