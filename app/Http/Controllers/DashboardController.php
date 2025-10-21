@@ -17,7 +17,7 @@ class DashboardController extends Controller
             ->where('status', 'Diproses')
             ->count();
         $laporanSelesai = Laporan::where('user_id', $userId)
-            ->where('status', 'Selesai')
+            ->where('status', 'Selesai Ditangani') // ubah ke status yg sesuai database
             ->count();
 
         // Kirim ke view
