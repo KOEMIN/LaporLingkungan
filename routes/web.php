@@ -3,7 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\DashboardController; // Tambahkan ini
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,20 +12,36 @@ use App\Http\Controllers\DashboardController; // Tambahkan ini
 |--------------------------------------------------------------------------
 */
 
+// ===== RUTE PUBLIK (Bisa diakses siapa saja) =====
 Route::get('/', [LaporanController::class, 'index'])->name('home');
 
+
+// ===== RUTE PENGGUNA TERAUTENTIKASI (USER BIASA) =====
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    // ✅ Dashboard sekarang pakai controller
+    
+    // Dashboard User
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Profil
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Laporan
+    // CRUD Laporan oleh User
     Route::resource('laporan', LaporanController::class);
 });
 
+
+// ===== RUTE ADMIN (Terpisah dan dilindungi) =====
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+         ->name('admin.dashboard');
+
+    // (Tambahkan rute admin lainnya di sini jika perlu)
+});
+
+
+// ===== RUTE OTENTIKASI (Login, Register, dll) =====
 require __DIR__.'/auth.php';

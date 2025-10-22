@@ -11,20 +11,30 @@
                 </div>
 
                 {{-- Navigasi Utama (Desktop) --}}
-                <div class="hidden space-x-2 sm:-my-px sm:ms-10 sm:flex items-center">
-                    
-                    {{-- Link Laporan (Home, untuk semua pengunjung) --}}
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Laporan') }}
-                    </x-nav-link>
+                {{-- Navigasi Utama (Desktop) --}}
+<div class="hidden space-x-2 sm:-my-px sm:ms-10 sm:flex items-center">
+    
+    {{-- Link Laporan (Home, untuk semua pengunjung) --}}
+    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
+        {{ __('Laporan') }}
+    </x-nav-link>
 
-                    @auth
-                    {{-- Link Dashboard (Hanya untuk user login) --}}
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                    @endauth
-                </div>
+    @auth
+    {{-- Link Dashboard (Hanya untuk user login) --}}
+        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+            {{ __('Dashboard') }}
+        </x-nav-link>
+
+    {{-- ===== TAMBAHKAN LINK ADMIN DI SINI ===== --}}
+    @if(Auth::user()->isAdmin())
+        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+            {{ __('Admin Panel') }}
+        </x-nav-link>
+    @endif
+    {{-- ======================================= --}}
+
+    @endauth
+</div>
             </div>
 
             {{-- Bagian Kanan (Auth Status) --}}
@@ -89,16 +99,26 @@
     </div>
 
     {{-- Responsive Navigation Links (Mobile) --}}
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        @auth
-            <div class="pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                    {{ __('Laporan') }}
+{{-- Responsive Navigation Links (Mobile) --}}
+<div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    @auth
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                {{ __('Laporan') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+
+            {{-- ===== TAMBAHKAN LINK ADMIN (MOBILE) DI SINI ===== --}}
+            @if(Auth::user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    {{ __('Admin Panel') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-            </div>
+            @endif
+            {{-- =============================================== --}}
+
+        </div>
 
             <div class="pt-4 pb-1 border-t border-gray-200">
                 <div class="px-4">

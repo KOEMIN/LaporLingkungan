@@ -35,14 +35,26 @@ class LaporanPolicy
     /**
      * Determine whether the user can update the model.
      */
+// app/Policies/LaporanPolicy.php
+
 public function update(User $user, Laporan $laporan): bool
 {
-    return $user->id === $laporan->user_id;
+    // Admin boleh update kapan saja
+    if ($user->isAdmin()) {
+        return true;
+    }
+    // User biasa hanya boleh update jika dia pemilik DAN status masih 'Dilaporkan'
+    return $user->id === $laporan->user_id && $laporan->status === 'Dilaporkan';
 }
 
 public function delete(User $user, Laporan $laporan): bool
 {
-    return $user->id === $laporan->user_id;
+    // Admin boleh hapus kapan saja
+    if ($user->isAdmin()) {
+        return true;
+    }
+    // User biasa hanya boleh hapus jika dia pemilik DAN status masih 'Dilaporkan'
+    return $user->id === $laporan->user_id && $laporan->status === 'Dilaporkan';
 }
 
     /**

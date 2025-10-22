@@ -64,38 +64,46 @@ class LaporanController extends Controller
     }
 
     // 🔹 Update laporan
-    public function update(Request $request, $id)
-    {
-        $laporan = Laporan::findOrFail($id);
+    public function update(Request $request, Laporan $laporan)
+{
+    // Otorisasi akan mengecek policy yang sudah kita ubah
+    $this->authorize('update', $laporan);
 
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'lokasi' => 'required|string|max:255',
-            'status' => 'required|string|in:Dilaporkan,Diproses,Selesai Ditangani',
-            'foto' => 'nullable|image|max:2048',
-        ]);
+    // Aturan validasi dasar
+    $rules = [
+        'judul' => 'required|string|max:255',
+        'deskripsi' => 'required|string',
+        'lokasi' => 'required|string|max:255',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ];
 
-        // Jika ada foto baru, hapus foto lama dan upload baru
-        if ($request->hasFile('foto')) {
-            if ($laporan->foto && Storage::disk('public')->exists($laporan->foto)) {
-                Storage::disk('public')->delete($laporan->foto);
-            }
-            $laporan->foto = $request->file('foto')->store('foto_laporan', 'public');
+    // Tambahkan aturan validasi status HANYA JIKA user adalah admin
+    /** @var \App\Models\User|null $user */
+$user = Auth::user();
+
+if ($user && $user->isAdmin()) {
+    $rules['status'] = 'required|in:Dilaporkan,Diproses,Selesai Ditangani';
+}
+
+    // Jalankan validasi
+    $validated = $request->validate($rules);
+
+    // Proses upload foto (jika ada file baru)
+    if ($request->hasFile('foto')) {
+        // Hapus foto lama jika ada
+        if ($laporan->foto) {
+            Storage::disk('public')->delete($laporan->foto); 
         }
-
-        // Update data laporan
-        $laporan->update([
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
-            'lokasi' => $request->lokasi,
-            'status' => $request->status,
-            'foto' => $laporan->foto,
-        ]);
-
-        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil diperbarui!');
+        // Simpan file baru dan simpan path lengkapnya
+        $path = $request->file('foto')->store('fotos_laporan', 'public');
+        $validated['foto'] = $path;
     }
 
+    // Update laporan
+    $laporan->update($validated);
+
+    return redirect()->route('laporan.show', $laporan)->with('success', 'Laporan berhasil diperbarui!');
+}
     // 🔹 Hapus laporan
     public function destroy($id)
     {

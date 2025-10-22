@@ -60,18 +60,16 @@
                     </div>
 
                     {{-- Status (Dropdown) --}}
-                    <div>
-                        <x-input-label for="status" value="{{ __('Status Laporan') }}" />
-                        <select id="status" name="status" required
-                                class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('status') border-red-500 @enderror">
-                            <option value="Dilaporkan" {{ old('status', $laporan->status) == 'Dilaporkan' ? 'selected' : '' }}>Dilaporkan</option>
-                            <option value="Diproses" {{ old('status', $laporan->status) == 'Diproses' ? 'selected' : '' }}>Diproses</option>
-                            <option value="Selesai Ditangani" {{ old('status', $laporan->status) == 'Selesai Ditangani' ? 'selected' : '' }}>Selesai Ditangani</option>
-                        </select>
-                        @error('status')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
-                         {{-- Catatan: Tambahkan logika @can jika hanya admin yang boleh ubah status --}}
-                    </div>
-
+@if(Auth::user()->isAdmin())
+    <div class="mt-4">
+        <x-input-label for="status" :value="__('Ubah Status Laporan')" />
+        <select name="status" id="status" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+            <option value="Dilaporkan" @selected(old('status', $laporan->status) == 'Dilaporkan')>Dilaporkan</option>
+            <option value="Diproses" @selected(old('status', $laporan->status) == 'Diproses')>Diproses</option>
+            <option value="Selesai Ditangani" @selected(old('status', $laporan->status) == 'Selesai Ditangani')>Selesai Ditangani</option>
+        </select>
+    </div>
+@endif
                     {{-- Ganti Foto (Opsional) --}}
                     <div>
                         <x-input-label for="foto" value="{{ __('Ganti Foto Bukti (Opsional)') }}" />
